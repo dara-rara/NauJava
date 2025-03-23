@@ -1,21 +1,43 @@
 package ru.glebova.NauJava.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import ru.glebova.NauJava.domain.Pupil;
 import ru.glebova.NauJava.service.PupilService;
 
+/**
+ * Класс CommandProcessor отвечает за обработку команд, введённых пользователем,
+ * и взаимодействие с сервисом PupilService для выполнения операций над учениками.
+ * Поддерживаемые команды:
+ * <ul>
+ *     <li>create <id> <имя> <фамилия> - создание нового ученика</li>
+ *     <li>find <id> - поиск ученика по ID</li>
+ *     <li>update <id> <новое_имя> <новая_фамилия> - обновление данных ученика</li>
+ *     <li>delete <id> - удаление ученика по ID</li>
+ * </ul>
+ *
+ * @see PupilService
+ */
 @Component
 public class CommandProcessor {
 
     private final PupilService pupilService;
 
-    @Lazy
+    /**
+     * Конструктор класса CommandProcessor.
+     *
+     * @param pupilService сервис для работы с данными учеников
+     */
     public CommandProcessor(PupilService pupilService) {
         this.pupilService = pupilService;
     }
 
+    /**
+     * Обрабатывает введённую пользователем команду.
+     * В зависимости от команды вызывает соответствующий метод сервиса PupilService.
+     *
+     * @param input введённая пользователем команда
+     * @throws IllegalArgumentException если команда содержит неверное кол-во аргументов
+     */
     public void processCommand(String input) {
         String[] cmd = input.split(" ");
         try {
