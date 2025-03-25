@@ -3,8 +3,8 @@ package ru.glebova.NauJava.domain;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Pupil")
-public class Pupil {
+@Table(name = "Teacher")
+public class Teacher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -14,8 +14,8 @@ public class Pupil {
     private Users users;
 
     @ManyToOne
-    @JoinColumn(name = "classId", nullable = false)
-    private Class classValue;
+    @JoinColumn(name = "subjectId", nullable = false)
+    private Subject subject;
 
     public Long getId() {
         return id;
@@ -33,11 +33,11 @@ public class Pupil {
         this.users = users;
     }
 
-    public Class getClassValue() {
-        return classValue;
+    public Subject getSubject() {
+        return subject;
     }
 
-    public void setClassValue(Class classValue) {
-        this.classValue = classValue;
+    public void setSubject(Subject subject) {
+        this.subject = subject;
     }
 }

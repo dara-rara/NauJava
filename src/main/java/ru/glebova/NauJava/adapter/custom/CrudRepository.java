@@ -1,4 +1,4 @@
-package ru.glebova.NauJava.repository;
+package ru.glebova.NauJava.adapter.custom;
 
 public interface CrudRepository<T, ID> {
     void create(T entity);
