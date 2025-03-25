@@ -1,50 +1,32 @@
 package ru.glebova.NauJava.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import ru.glebova.NauJava.adapter.repository.GradeRepository;
+import ru.glebova.NauJava.adapter.repository.PupilRepository;
+import ru.glebova.NauJava.adapter.repository.UsersRepository;
+import ru.glebova.NauJava.domain.Grade;
 import ru.glebova.NauJava.domain.Pupil;
-import ru.glebova.NauJava.repository.PupilRepository;
+import ru.glebova.NauJava.domain.Users;
+
+import java.util.List;
 
 
 @Service
 public class PupilServiceImpl implements PupilService {
 
     private final PupilRepository pupilRepository;
+    private final GradeRepository gradeRepository;
+    private final UsersRepository usersRepository;
+    private final PlatformTransactionManager transactionManager;
 
-    public PupilServiceImpl(PupilRepository pupilRepository) {
+    public PupilServiceImpl(PupilRepository pupilRepository, GradeRepository gradeRepository, UsersRepository usersRepository, PlatformTransactionManager transactionManager) {
         this.pupilRepository = pupilRepository;
-    }
-
-    @Override
-    public void createPupil(Long id, String firstname, String lastname) {
-        if (id == null || firstname == null || lastname == null) {
-            throw new IllegalArgumentException("ID, имя и фамилия ученика не могут быть null.");
-        }
-        if (firstname.isBlank() || lastname.isBlank()) {
-            throw new IllegalArgumentException("Имя и фамилия ученика не могут быть пустыми.");
-        }
-
-        if (pupilRepository.read(id) != null) {
-            throw new IllegalArgumentException("Ученик с id " + id + " уже существует.");
-        }
-
-        Pupil newPupil = new Pupil();
-        newPupil.setId(id);
-        newPupil.setFirstname(firstname);
-        newPupil.setLastname(lastname);
-        pupilRepository.create(newPupil);
-    }
-
-    @Override
-    public Pupil findById(Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID ученика не может быть null.");
-        }
-
-        Pupil pupil = pupilRepository.read(id);
-        if (pupil == null) {
-            throw new IllegalArgumentException("Ученик с id " + id + " не найден.");
-        }
-        return pupil;
+        this.gradeRepository = gradeRepository;
+        this.usersRepository = usersRepository;
+        this.transactionManager = transactionManager;
     }
 
     @Override
@@ -53,26 +35,27 @@ public class PupilServiceImpl implements PupilService {
             throw new IllegalArgumentException("ID ученика не может быть null.");
         }
 
-        if (pupilRepository.read(id) == null) {
-            throw new IllegalArgumentException("Ученик с id " + id + " не найден.");
+        TransactionStatus status = transactionManager
+                .getTransaction(new DefaultTransactionDefinition());
+
+        try {
+            Pupil pupil = pupilRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Ученик с ID " + id + " не найден."));
+
+            Users users = usersRepository.findById(pupil.getUser().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Пользователь с ID " +
+                            pupil.getUser().getId() + " не найден."));
+
+            List<Grade> grades = gradeRepository.findByPupil(pupil);
+
+            gradeRepository.deleteAll(grades);
+            pupilRepository.delete(pupil);
+            usersRepository.delete(users);
+
+            transactionManager.commit(status);
+        } catch (Exception ex) {
+            transactionManager.rollback(status);
+            throw ex;
         }
-
-        pupilRepository.delete(id);
-    }
-
-    @Override
-    public void updateProfile(Long id, String newFirstname, String newLastname) {
-        if (id == null || newFirstname == null || newLastname == null) {
-            throw new IllegalArgumentException("ID, имя и фамилия ученика не могут быть null.");
-        }
-
-        Pupil pupil = pupilRepository.read(id);
-        if (pupil == null) {
-            throw new IllegalArgumentException("Ученик с id " + id + " не найден.");
-        }
-
-        pupil.setFirstname(newFirstname);
-        pupil.setLastname(newLastname);
-        pupilRepository.update(pupil);
     }
 }
