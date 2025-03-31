@@ -3,30 +3,25 @@ package ru.glebova.NauJava;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
 import ru.glebova.NauJava.adapter.repository.*;
 import ru.glebova.NauJava.domain.*;
-import ru.glebova.NauJava.domain.Class;
+import ru.glebova.NauJava.domain.Classes;
 import ru.glebova.NauJava.service.PupilService;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doThrow;
 
 
 @SpringBootTest
-@Import(ConfigurationTest.class)
-class PupilServiceTest {
+class PupilServiceTest extends BaseTest {
 
     private final UsersRepository usersRepository;
     private final ClassRepository classRepository;
     private final SubjectRepository subjectRepository;
     private final TeacherRepository teacherRepository;
     private final PupilRepository pupilRepository;
-    private final TestValue testValue;
     private final GradeRepository gradeRepository;
     private final PupilService pupilService;
     private final PlatformTransactionManager transactionManager;
@@ -34,14 +29,13 @@ class PupilServiceTest {
     @Autowired
     public PupilServiceTest(UsersRepository usersRepository, ClassRepository classRepository,
                             SubjectRepository subjectRepository, TeacherRepository teacherRepository,
-                            PupilRepository pupilRepository, TestValue testValue,
-                            GradeRepository gradeRepository, PupilService pupilService, PlatformTransactionManager transactionManager) {
+                            PupilRepository pupilRepository, GradeRepository gradeRepository,
+                            PupilService pupilService, PlatformTransactionManager transactionManager) {
         this.usersRepository = usersRepository;
         this.classRepository = classRepository;
         this.subjectRepository = subjectRepository;
         this.teacherRepository = teacherRepository;
         this.pupilRepository = pupilRepository;
-        this.testValue = testValue;
         this.gradeRepository = gradeRepository;
         this.pupilService = pupilService;
         this.transactionManager = transactionManager;
@@ -50,22 +44,22 @@ class PupilServiceTest {
     @Test
     void testDeleteById() {
 
-        Users user1 = testValue.createUser(Role.TEACHER);
+        Users user1 = TestValue.createUser(Role.TEACHER);
         usersRepository.save(user1);
 
-        Subject subject = testValue.createSubject();
+        Subject subject = TestValue.createSubject();
         subjectRepository.save(subject);
 
-        Teacher teacher = testValue.createTeacher(subject, user1);
+        Classes classes = TestValue.createClass();
+        classRepository.save(classes);
+
+        Teacher teacher = TestValue.createTeacher(subject, user1, classes);
         teacherRepository.save(teacher);
 
-        Class classTest = testValue.createClass(teacher);
-        classRepository.save(classTest);
-
-        Users user2 = testValue.createUser(Role.PUPIL);
+        Users user2 = TestValue.createUser(Role.PUPIL);
         usersRepository.save(user2);
 
-        Pupil pupil = testValue.createPupil(classTest, user2);
+        Pupil pupil = TestValue.createPupil(classes, user2);
         pupilRepository.save(pupil);
 
         pupilService.deleteById(pupil.getId());

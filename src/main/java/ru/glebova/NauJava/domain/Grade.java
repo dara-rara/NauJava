@@ -7,19 +7,23 @@ import jakarta.validation.constraints.Min;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "Grade")
+@Table(name = "grade")
 public class Grade {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "pupilId", nullable = false)
+    @JoinColumn(name = "pupil_id", nullable = false)
     private Pupil pupil;
 
     @ManyToOne
-    @JoinColumn(name = "subjectId", nullable = false)
+    @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
+
+    @ManyToOne
+    @JoinColumn(name = "teacher_id", nullable = false)
+    private Teacher teacher;
 
     @Column(nullable = false)
     @Min(1)
@@ -68,5 +72,13 @@ public class Grade {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
     }
 }

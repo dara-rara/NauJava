@@ -24,11 +24,11 @@ public class CustomScheduleRepositoryImpl implements CustomScheduleRepository {
         CriteriaQuery<Schedule> query = cb.createQuery(Schedule.class);
         Root<Schedule> schedule = query.from(Schedule.class);
 
-        Join<Object, Object> classJoin = schedule.join("classValue");
+        Join<Object, Object> classJoin = schedule.join("classes");
         Join<Object, Object> subjectJoin = schedule.join("subject");
 
-        Predicate classPredicate = cb.equal(classJoin.get("className"), className);
-        Predicate subjectPredicate = cb.equal(subjectJoin.get("subjectName"), subjectName);
+        Predicate classPredicate = cb.equal(classJoin.get("name"), className);
+        Predicate subjectPredicate = cb.equal(subjectJoin.get("name"), subjectName);
         query.where(cb.and(classPredicate, subjectPredicate));
 
         return entityManager.createQuery(query).getResultList();

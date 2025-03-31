@@ -3,12 +3,11 @@ package ru.glebova.NauJava;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 import ru.glebova.NauJava.adapter.custom.CustomGradeRepositoryImpl;
 import ru.glebova.NauJava.adapter.repository.*;
 import ru.glebova.NauJava.domain.*;
-import ru.glebova.NauJava.domain.Class;
+import ru.glebova.NauJava.domain.Classes;
 
 import java.util.List;
 
@@ -17,8 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @Transactional
-@Import(ConfigurationTest.class)
-class GradeRepositoryTest {
+class GradeRepositoryTest extends BaseTest {
 
     private final UsersRepository usersRepository;
     private final ClassRepository classRepository;
@@ -27,13 +25,12 @@ class GradeRepositoryTest {
     private final PupilRepository pupilRepository;
     private final GradeRepository gradeRepository;
     private final CustomGradeRepositoryImpl customGradeRepository;
-    private final TestValue testValue;
 
     @Autowired
     public GradeRepositoryTest(UsersRepository usersRepository, ClassRepository classRepository,
                                SubjectRepository subjectRepository, TeacherRepository teacherRepository,
                                PupilRepository pupilRepository, GradeRepository gradeRepository,
-                               CustomGradeRepositoryImpl customGradeRepository, TestValue testValue) {
+                               CustomGradeRepositoryImpl customGradeRepository) {
         this.usersRepository = usersRepository;
         this.classRepository = classRepository;
         this.subjectRepository = subjectRepository;
@@ -41,30 +38,29 @@ class GradeRepositoryTest {
         this.pupilRepository = pupilRepository;
         this.gradeRepository = gradeRepository;
         this.customGradeRepository = customGradeRepository;
-        this.testValue = testValue;
     }
 
     @Test
     void testFindByPupilAndSubject() {
-        Users user1 = testValue.createUser(Role.TEACHER);
+        Users user1 = TestValue.createUser(Role.TEACHER);
         usersRepository.save(user1);
 
-        Subject subject = testValue.createSubject();
+        Subject subject = TestValue.createSubject();
         subjectRepository.save(subject);
 
-        Teacher teacher = testValue.createTeacher(subject, user1);
+        Classes classes = TestValue.createClass();
+        classRepository.save(classes);
+
+        Teacher teacher = TestValue.createTeacher(subject, user1, classes);
         teacherRepository.save(teacher);
 
-        Class classTest = testValue.createClass(teacher);
-        classRepository.save(classTest);
-
-        Users user2 = testValue.createUser(Role.PUPIL);
+        Users user2 = TestValue.createUser(Role.PUPIL);
         usersRepository.save(user2);
 
-        Pupil pupil = testValue.createPupil(classTest, user2);
+        Pupil pupil = TestValue.createPupil(classes, user2);
         pupilRepository.save(pupil);
 
-        Grade grade = testValue.createGrade(pupil, subject, 5);
+        Grade grade = TestValue.createGrade(pupil, subject, teacher, 5);
         gradeRepository.save(grade);
 
         List<Grade> grades = gradeRepository.findByPupilAndSubject(pupil, subject);
@@ -75,25 +71,25 @@ class GradeRepositoryTest {
 
     @Test
     void testFindByPupilAndSubjectCustom() {
-        Users user1 = testValue.createUser(Role.TEACHER);
+        Users user1 = TestValue.createUser(Role.TEACHER);
         usersRepository.save(user1);
 
-        Subject subject = testValue.createSubject();
+        Subject subject = TestValue.createSubject();
         subjectRepository.save(subject);
 
-        Teacher teacher = testValue.createTeacher(subject, user1);
+        Classes classes = TestValue.createClass();
+        classRepository.save(classes);
+
+        Teacher teacher = TestValue.createTeacher(subject, user1, classes);
         teacherRepository.save(teacher);
 
-        Class classTest = testValue.createClass(teacher);
-        classRepository.save(classTest);
-
-        Users user2 = testValue.createUser(Role.PUPIL);
+        Users user2 = TestValue.createUser(Role.PUPIL);
         usersRepository.save(user2);
 
-        Pupil pupil = testValue.createPupil(classTest, user2);
+        Pupil pupil = TestValue.createPupil(classes, user2);
         pupilRepository.save(pupil);
 
-        Grade grade = testValue.createGrade(pupil, subject, 4);
+        Grade grade = TestValue.createGrade(pupil, subject, teacher, 4);
         gradeRepository.save(grade);
 
         List<Grade> grades = customGradeRepository.findGradesByPupilAndSubject(pupil, subject);

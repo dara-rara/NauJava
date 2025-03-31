@@ -12,18 +12,18 @@ public class Schedule {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "classId", nullable = false)
-    private Class classValue;
+    @JoinColumn(name = "class_id", nullable = false)
+    private Classes classes;
 
     @ManyToOne
-    @JoinColumn(name = "subjectId", nullable = false)
+    @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
 
     @ManyToOne
-    @JoinColumn(name = "teacherId", nullable = false)
+    @JoinColumn(name = "teacher_id", nullable = false)
     private Teacher teacher;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String dayOfWeek;
 
     @Column(nullable = false)
@@ -36,14 +36,6 @@ public class Schedule {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Class getClassValue() {
-        return classValue;
-    }
-
-    public void setClassValue(Class classValue) {
-        this.classValue = classValue;
     }
 
     public Subject getSubject() {
@@ -76,5 +68,13 @@ public class Schedule {
 
     public void setTime(LocalTime time) {
         this.time = time;
+    }
+
+    public Classes getClasses() {
+        return classes;
+    }
+
+    public void setClasses(Classes classes) {
+        this.classes = classes;
     }
 }

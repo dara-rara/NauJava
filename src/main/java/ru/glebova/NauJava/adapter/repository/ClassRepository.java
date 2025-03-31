@@ -1,10 +1,8 @@
 package ru.glebova.NauJava.adapter.repository;
 
-import ru.glebova.NauJava.domain.Class;
+import ru.glebova.NauJava.domain.Classes;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface ClassRepository extends CrudRepository<Class, Long> {
+public interface ClassRepository extends CrudRepository<Classes, Long> {
 
 }

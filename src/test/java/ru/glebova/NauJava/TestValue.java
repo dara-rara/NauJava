@@ -1,61 +1,62 @@
 package ru.glebova.NauJava;
 
 import ru.glebova.NauJava.domain.*;
-import ru.glebova.NauJava.domain.Class;
+import ru.glebova.NauJava.domain.Classes;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
-public class TestValue {
+public final class TestValue {
 
-    public Schedule createSchedule(Class classValue, Teacher teacher, Subject subject) {
+    public static Schedule createSchedule(Classes classes, Teacher teacher, Subject subject) {
         Schedule schedule = new Schedule();
         schedule.setTeacher(teacher);
-        schedule.setClassValue(classValue);
+        schedule.setClasses(classes);
         schedule.setSubject(subject);
         schedule.setTime(LocalTime.now());
         schedule.setDayOfWeek(UUID.randomUUID().toString());
         return schedule;
     }
 
-    public Grade createGrade(Pupil pupil, Subject subject, Integer count) {
+    public static Grade createGrade(Pupil pupil, Subject subject, Teacher teacher, Integer count) {
         Grade grade = new Grade();
         grade.setPupil(pupil);
         grade.setSubject(subject);
+        grade.setTeacher(teacher);
         grade.setGrade(count);
         grade.setDate(LocalDate.now());
         return grade;
     }
 
-    public Pupil createPupil(Class classTest, Users user) {
+    public static Pupil createPupil(Classes classes, Users user) {
         Pupil pupil = new Pupil();
         pupil.setUser(user);
-        pupil.setClassValue(classTest);
+        pupil.setClasses(classes);
         return pupil;
     }
 
-    public Class createClass(Teacher teacher) {
-        Class classTest = new Class();
-        classTest.setClassName(UUID.randomUUID().toString());
-        classTest.setTeacher(teacher);
-        return classTest;
+    public static Classes createClass() {
+        Classes classes = new Classes();
+        classes.setName(UUID.randomUUID().toString());
+        return classes;
     }
 
-    public Teacher createTeacher(Subject subject, Users user) {
+    public static Teacher createTeacher(Subject subject, Users user, Classes classes) {
         Teacher teacher = new Teacher();
         teacher.setUser(user);
         teacher.setSubject(subject);
+        teacher.addClass(classes);
         return teacher;
     }
 
-    public Subject createSubject() {
+    public static Subject createSubject() {
         Subject subject = new Subject();
-        subject.setSubjectName(UUID.randomUUID().toString());
+        subject.setName(UUID.randomUUID().toString());
         return subject;
     }
 
-    public Users createUser(Role role) {
+    public static Users createUser(Role role) {
         Users user = new Users();
         user.setUsername(UUID.randomUUID().toString());
         user.setPassword(UUID.randomUUID().toString());

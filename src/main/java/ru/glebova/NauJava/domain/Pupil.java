@@ -10,12 +10,12 @@ public class Pupil {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private Users users;
 
     @ManyToOne
-    @JoinColumn(name = "classId", nullable = false)
-    private Class classValue;
+    @JoinColumn(name = "class_id", nullable = false)
+    private Classes classes;
 
     public Long getId() {
         return id;
@@ -33,11 +33,11 @@ public class Pupil {
         this.users = users;
     }
 
-    public Class getClassValue() {
-        return classValue;
+    public Classes getClasses() {
+        return classes;
     }
 
-    public void setClassValue(Class classValue) {
-        this.classValue = classValue;
+    public void setClasses(Classes classes) {
+        this.classes = classes;
     }
 }

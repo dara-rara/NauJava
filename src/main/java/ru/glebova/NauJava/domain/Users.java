@@ -2,15 +2,15 @@ package ru.glebova.NauJava.domain;
 
 import jakarta.persistence.*;
 
+
 @Entity
-@Table(name = "Users")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "users")
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false, length = 50)
+    @Column(nullable = false, unique = true, length = 50)
     private String username;
 
     @Column(nullable = false, length = 100)
@@ -23,7 +23,7 @@ public class Users {
     private String lastName;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private Role role;
 
     public Long getId() {
@@ -74,5 +74,4 @@ public class Users {
         this.role = role;
     }
 }
-
 

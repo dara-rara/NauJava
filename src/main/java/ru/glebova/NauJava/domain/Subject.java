@@ -3,14 +3,14 @@ package ru.glebova.NauJava.domain;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Subject")
+@Table(name = "subject")
 public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
-    private String subjectName;
+    @Column(nullable = false, length = 50, unique = true)
+    private String name;
 
     public Long getId() {
         return id;
@@ -20,11 +20,11 @@ public class Subject {
         this.id = id;
     }
 
-    public String getSubjectName() {
-        return subjectName;
+    public String getName() {
+        return name;
     }
 
-    public void setSubjectName(String subjectName) {
-        this.subjectName = subjectName;
+    public void setName(String name) {
+        this.name = name;
     }
 }
