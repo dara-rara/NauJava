@@ -1,4 +1,4 @@
-package ru.glebova.NauJava.adapter.custom;
+package ru.glebova.NauJava.adapter.repository.custom;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -19,7 +19,7 @@ public class CustomScheduleRepositoryImpl implements CustomScheduleRepository {
     private EntityManager entityManager;
 
     @Override
-    public List<Schedule> findScheduleByClassValueAndSubject(String className, String subjectName) {
+    public List<Schedule> findScheduleByClassAndSubject(String className, String subjectName) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Schedule> query = cb.createQuery(Schedule.class);
         Root<Schedule> schedule = query.from(Schedule.class);

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Grade List</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+<h1>Grade List</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Student</th>
+        <th>Subject</th>
+        <th>Grade</th>
+        <th>Date</th>
+        <th>Teacher</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="grade : ${grades}">
+        <td th:text="${grade.id}"></td>
+        <td th:text="${grade.pupil.user.firstName + ' ' + grade.pupil.user.lastName}"></td>
+        <td th:text="${grade.subject.name}"></td>
+        <td th:text="${grade.grade}"></td>
+        <td th:text="${#temporals.format(grade.date, 'dd.MM.yyyy')}"></td>
+        <td th:text="${grade.teacher.user.firstName + ' ' + grade.teacher.user.lastName}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

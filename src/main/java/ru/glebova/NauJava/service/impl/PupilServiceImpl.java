@@ -1,4 +1,4 @@
-package ru.glebova.NauJava.service;
+package ru.glebova.NauJava.service.impl;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -10,6 +10,7 @@ import ru.glebova.NauJava.adapter.repository.UsersRepository;
 import ru.glebova.NauJava.domain.Grade;
 import ru.glebova.NauJava.domain.Pupil;
 import ru.glebova.NauJava.domain.Users;
+import ru.glebova.NauJava.service.PupilService;
 
 import java.util.List;
 

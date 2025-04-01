@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import ru.glebova.NauJava.adapter.custom.CustomScheduleRepositoryImpl;
+import ru.glebova.NauJava.adapter.repository.custom.CustomScheduleRepositoryImpl;
 import ru.glebova.NauJava.adapter.repository.*;
 import ru.glebova.NauJava.domain.Classes;
 import ru.glebova.NauJava.domain.*;
@@ -79,7 +79,7 @@ class ScheduleRepositoryTest extends BaseTest {
         Schedule schedule = TestValue.createSchedule(classes, teacher, subject);
         scheduleRepository.save(schedule);
 
-        List<Schedule> schedules = customScheduleRepository.findScheduleByClassValueAndSubject(classes.getName(),
+        List<Schedule> schedules = customScheduleRepository.findScheduleByClassAndSubject(classes.getName(),
                 subject.getName());
 
         assertEquals(1, schedules.size());
