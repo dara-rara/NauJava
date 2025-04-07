@@ -1,4 +1,4 @@
-package ru.glebova.NauJava.adapter.custom;
+package ru.glebova.NauJava.adapter.repository.custom;
 
 import ru.glebova.NauJava.domain.Grade;
 import ru.glebova.NauJava.domain.Pupil;
