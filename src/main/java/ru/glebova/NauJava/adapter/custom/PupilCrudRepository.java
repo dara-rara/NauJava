@@ -1,4 +1,4 @@
-package ru.glebova.NauJava.repository;
+package ru.glebova.NauJava.adapter.custom;
 
 import org.springframework.stereotype.Component;
 import ru.glebova.NauJava.domain.Pupil;
@@ -6,11 +6,11 @@ import ru.glebova.NauJava.domain.Pupil;
 import java.util.Map;
 
 @Component
-public class PupilRepository implements CrudRepository<Pupil, Long> {
+public class PupilCrudRepository implements CrudRepository<Pupil, Long> {
 
     private final Map<Long, Pupil> pupilContainer;
 
-    public PupilRepository(Map<Long, Pupil> pupilContainer) {
+    public PupilCrudRepository(Map<Long, Pupil> pupilContainer) {
         this.pupilContainer = pupilContainer;
     }
 

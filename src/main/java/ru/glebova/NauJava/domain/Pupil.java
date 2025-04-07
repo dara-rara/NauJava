@@ -1,10 +1,21 @@
 package ru.glebova.NauJava.domain;
 
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "Pupil")
 public class Pupil {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String firstname;
-    private String lastname;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private Users users;
+
+    @ManyToOne
+    @JoinColumn(name = "class_id", nullable = false)
+    private Classes classes;
 
     public Long getId() {
         return id;
@@ -14,19 +25,19 @@ public class Pupil {
         this.id = id;
     }
 
-    public String getFirstname() {
-        return firstname;
+    public Users getUser() {
+        return users;
     }
 
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
+    public void setUser(Users users) {
+        this.users = users;
     }
 
-    public String getLastname() {
-        return lastname;
+    public Classes getClasses() {
+        return classes;
     }
 
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
+    public void setClasses(Classes classes) {
+        this.classes = classes;
     }
 }
