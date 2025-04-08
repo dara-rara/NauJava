@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Школьный дневник</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .main-container {
+            max-width: 600px;
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .logo {
+            width: 100px;
+            margin-bottom: 1.5rem;
+        }
+        .btn-action {
+            width: 200px;
+            margin: 0.5rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+        .btn-primary {
+            background-color: #4e73df;
+            border-color: #4e73df;
+        }
+        .btn-outline-primary {
+            color: #4e73df;
+            border-color: #4e73df;
+        }
+        .btn-outline-primary:hover {
+            background-color: #4e73df;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <img src="https://cdn-icons-png.flaticon.com/512/3565/3565418.png" alt="Логотип дневника" class="logo">
+    <h1 class="mb-4">Школьный электронный дневник</h1>
+    <p class="lead mb-4">Удобный инструмент для учёта успеваемости и школьной жизни</p>
+
+    <div class="d-flex justify-content-center flex-wrap">
+        <a th:href="@{/register}" class="btn btn-primary btn-action">
+            Регистрация
+        </a>
+        <a th:href="@{/login}" class="btn btn-outline-primary btn-action">
+            Вход
+        </a>
+    </div>
+</div>
+</body>
+</html>

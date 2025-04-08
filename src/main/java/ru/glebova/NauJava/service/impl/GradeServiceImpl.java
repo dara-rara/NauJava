@@ -1,5 +1,6 @@
 package ru.glebova.NauJava.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.glebova.NauJava.adapter.controller.dto.GradeDTO;
@@ -10,7 +11,7 @@ import ru.glebova.NauJava.adapter.repository.custom.CustomGradeRepository;
 import ru.glebova.NauJava.domain.Grade;
 import ru.glebova.NauJava.domain.Pupil;
 import ru.glebova.NauJava.domain.Subject;
-import ru.glebova.NauJava.exception.ResourceException;
+import ru.glebova.NauJava.exception.PupilNotFoundException;
 import ru.glebova.NauJava.service.GradeService;
 
 import java.util.List;
@@ -34,10 +35,10 @@ public class GradeServiceImpl implements GradeService {
     @Override
     public List<GradeDTO> getGradesPupilAndSubject(Long pupilId, Long subjectId) {
         Pupil pupil = pupilRepository.findById(pupilId)
-                .orElseThrow(() -> new ResourceException("Ученик с ID " + pupilId + " не найден"));
+                .orElseThrow(() -> new PupilNotFoundException(pupilId));
 
         Subject subject = subjectRepository.findById(subjectId)
-                .orElseThrow(() -> new ResourceException("Предмет с ID " + subjectId + " не найден"));
+                .orElseThrow(() -> new EntityNotFoundException("Предмет с ID " + subjectId + " не найден"));
 
         return customGradeRepository.findGradesByPupilAndSubject(pupil, subject)
                 .stream()
@@ -53,7 +54,7 @@ public class GradeServiceImpl implements GradeService {
     @Override
     public List<Grade> getGradesPupil(Long pupilId) {
         Pupil pupil = pupilRepository.findById(pupilId)
-                .orElseThrow(() -> new ResourceException("Ученик с ID " + pupilId + " не найден"));
+                .orElseThrow(() -> new PupilNotFoundException(pupilId));
         List<Grade> grades = gradeRepository.findByPupil(pupil);
         return grades;
     }
