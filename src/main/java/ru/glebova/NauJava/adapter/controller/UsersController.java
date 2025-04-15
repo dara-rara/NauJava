@@ -1,9 +1,13 @@
 package ru.glebova.NauJava.adapter.controller;
 
+import jakarta.persistence.EntityExistsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.glebova.NauJava.adapter.controller.dto.RegisterDTO;
 import ru.glebova.NauJava.service.UsersService;
 
@@ -13,37 +17,6 @@ public class UsersController {
 
     public UsersController(UsersService usersService) {
         this.usersService = usersService;
-    }
-
-    @GetMapping("/register")
-    public String showRegistrationForm(Model model) {
-        model.addAttribute("user", new RegisterDTO());
-        return "registration";
-    }
-
-    @PostMapping("/register")
-    public String registerUser(
-            @ModelAttribute("user") RegisterDTO registrationDto,
-            Model model) {
-        if (usersService.userExist(registrationDto.getUsername())) {
-            model.addAttribute("errorMessage", "Такой логин уже существует");
-            return "registration";
-        }
-        usersService.registerNewUser(registrationDto);
-        return "redirect:/login?registered";
-    }
-
-    @GetMapping("/login")
-    public String showLoginForm(
-            @RequestParam(value = "error", required = false) String error,
-            @RequestParam(value = "registered", required = false) String registered,
-            Model model) {
-        return "login";
-    }
-
-    @GetMapping("/logout")
-    public String showLogoutPage() {
-        return "logout";
     }
 
     @GetMapping("/")

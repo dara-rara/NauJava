@@ -25,7 +25,7 @@ public class UsersService implements UserDetailsService {
 
     public void registerNewUser(RegisterDTO registerDTO) {
         if (usersRepository.existsByUsername(registerDTO.getUsername())) {
-            throw new EntityExistsException("Логин уже занят");
+            throw new EntityExistsException("Такой логин уже существует");
         }
 
         Users user = new Users();
