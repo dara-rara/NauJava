@@ -26,7 +26,7 @@ public class SecurityConfiguration {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/register", "/login", "/").permitAll()
-                        .requestMatchers("/swagger-ui/**").hasRole("ADMIN")
+                        .requestMatchers("/swagger-ui/**", "/report/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -36,6 +36,7 @@ public class SecurityConfiguration {
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
+                        .accessDeniedPage("/error/403")
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
