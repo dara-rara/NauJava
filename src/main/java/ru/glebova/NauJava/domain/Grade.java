@@ -12,24 +12,19 @@ public class Grade {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @ManyToOne
     @JoinColumn(name = "pupil_id", nullable = false)
     private Pupil pupil;
-
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
-
     @ManyToOne
     @JoinColumn(name = "teacher_id", nullable = false)
     private Teacher teacher;
-
     @Column(nullable = false)
     @Min(1)
     @Max(5)
     private Integer grade;
-
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
     private LocalDate date;

@@ -5,19 +5,17 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "Homework")
+@Table(name = "homework")
 public class Homework {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_id", nullable = false)
     private Schedule schedule;
-
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
-
+    @Temporal(TemporalType.DATE)
     @Column(nullable = false)
     private LocalDate dueDate;
 
