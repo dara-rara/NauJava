@@ -12,14 +12,17 @@ import ru.glebova.NauJava.domain.Status;
 import ru.glebova.NauJava.domain.Teacher;
 import ru.glebova.NauJava.domain.Users;
 import ru.glebova.NauJava.service.ReportService;
+import ru.glebova.NauJava.service.dto.TaskResult;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.List;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -72,52 +75,58 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private void generateReportPupilAndTeacher(Long reportId) {
+        Report report = getReport(reportId);
+        long startTimeGeneral = System.currentTimeMillis();
+
         try {
-            long startTimeGeneral= System.currentTimeMillis();
-
-            Report report = getReport(reportId);
-
-            long startTimeOneProcessing = System.currentTimeMillis();
-
-            CompletableFuture<Long> userCountFuture = CompletableFuture.supplyAsync(() -> {
-                Thread.currentThread().setName("UserCountThread");
-                return usersRepository.count();
+            CompletableFuture<TaskResult<Long>> userCountFuture = CompletableFuture.supplyAsync(() -> {
+                long startTime = System.currentTimeMillis();
+                Long count = usersRepository.count();
+                return new TaskResult<>(count, System.currentTimeMillis() - startTime);
             });
 
-            long timeOneProcessing = (System.currentTimeMillis() - startTimeOneProcessing);
-            long startTimeTwoProcessing = System.currentTimeMillis();
-
-            CompletableFuture<Iterable<Teacher>> teacherListFuture = CompletableFuture.supplyAsync(() -> {
-                Thread.currentThread().setName("TeacherListThread");
-                return teacherRepository.findAll();
+            CompletableFuture<TaskResult<Iterable<Teacher>>> teacherListFuture = CompletableFuture.supplyAsync(() -> {
+                long startTime = System.currentTimeMillis();
+                Iterable<Teacher> teachers = teacherRepository.findAll();
+                return new TaskResult<>(teachers, System.currentTimeMillis() - startTime);
             });
 
-            long timeTwoProcessing = (System.currentTimeMillis() - startTimeTwoProcessing);
+            CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(userCountFuture, teacherListFuture)
+                    .exceptionally(ex -> {
+                        updateReportStatus(reportId, Status.ERROR);
+                        throw new CompletionException("Ошибка при выполнении асинхронных задач", ex);
+                    });
+            combinedFuture.join();
 
-            CompletableFuture.allOf(userCountFuture, teacherListFuture).join();
+            TaskResult<Long> userCountResult = userCountFuture.get();
+            TaskResult<Iterable<Teacher>> teacherListResult = teacherListFuture.get();
 
-            long userCount = userCountFuture.get();
-            List<Teacher> teachers = (List<Teacher>) teacherListFuture.get();
-
-            report.setDescription("Kоличество пользователей: " + userCount + "\n" +
-                    "Cписок учителей: " + teachers.stream()
-                    .map(Teacher::getUser)
-                    .map(user -> user.getLastName() + " " + user.getFirstName())
-                    .collect(Collectors.joining(", ")));
+            report.setDescription(buildReportDescription(userCountResult.getResult(), teacherListResult.getResult()));
             report.setStatus(Status.COMPLETED);
-            report.setProcessingTimeMillisOne(timeOneProcessing);
-            report.setProcessingTimeMillisTwo(timeTwoProcessing);
+            report.setProcessingTimeMillisOne(userCountResult.getExecutionTime());
+            report.setProcessingTimeMillisTwo(teacherListResult.getExecutionTime());
             report.setProcessingTimeMillisGeneral(System.currentTimeMillis() - startTimeGeneral);
-            reportRepository.save(report);
 
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (ExecutionException e) {
+            throw new RuntimeException("Ошибка при формировании отчета", e.getCause());
+        } catch (InterruptedException e) {
             updateReportStatus(reportId, Status.ERROR);
             Thread.currentThread().interrupt();
             throw new RuntimeException("Прерывание формирования отчета", e);
         } catch (Exception e) {
             updateReportStatus(reportId, Status.ERROR);
             throw new RuntimeException("Неожиданная ошибка при формировании отчета", e);
+        } finally {
+            reportRepository.save(report);
         }
+    }
+
+    private String buildReportDescription(Long userCount, Iterable<Teacher> teachers) {
+        return "Количество пользователей: " + userCount + "\n" +
+                "Список учителей: " + StreamSupport.stream(teachers.spliterator(), false)
+                .map(Teacher::getUser)
+                .map(user -> user.getLastName() + " " + user.getFirstName())
+                .collect(Collectors.joining(", "));
     }
 
     @Override
