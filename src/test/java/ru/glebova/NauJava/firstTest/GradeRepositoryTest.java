@@ -1,10 +1,10 @@
-package ru.glebova.NauJava;
+package ru.glebova.NauJava.firstTest;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import ru.glebova.NauJava.BaseTest;
 import ru.glebova.NauJava.adapter.repository.custom.CustomGradeRepositoryImpl;
 import ru.glebova.NauJava.adapter.repository.*;
 import ru.glebova.NauJava.domain.*;

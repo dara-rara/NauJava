@@ -1,9 +1,10 @@
-package ru.glebova.NauJava;
+package ru.glebova.NauJava.firstTest;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.PlatformTransactionManager;
+import ru.glebova.NauJava.BaseTest;
 import ru.glebova.NauJava.adapter.repository.*;
 import ru.glebova.NauJava.domain.*;
 import ru.glebova.NauJava.domain.Classes;
