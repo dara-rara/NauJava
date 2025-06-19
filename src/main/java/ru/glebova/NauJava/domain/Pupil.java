@@ -3,7 +3,7 @@ package ru.glebova.NauJava.domain;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Pupil")
+@Table(name = "pupil")
 public class Pupil {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
