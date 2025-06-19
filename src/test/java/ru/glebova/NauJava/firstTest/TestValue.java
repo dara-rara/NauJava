@@ -1,4 +1,4 @@
-package ru.glebova.NauJava;
+package ru.glebova.NauJava.firstTest;
 
 import ru.glebova.NauJava.domain.*;
 import ru.glebova.NauJava.domain.Classes;

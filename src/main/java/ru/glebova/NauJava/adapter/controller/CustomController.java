@@ -1,17 +1,13 @@
 package ru.glebova.NauJava.adapter.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.glebova.NauJava.adapter.controller.dto.GradeDTO;
-import ru.glebova.NauJava.adapter.controller.dto.ScheduleDTO;
-import ru.glebova.NauJava.domain.Grade;
-import ru.glebova.NauJava.domain.Schedule;
+import ru.glebova.NauJava.adapter.controller.dto.ListDTO;
 import ru.glebova.NauJava.service.GradeService;
 import ru.glebova.NauJava.service.ScheduleService;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/custom")
+@RequestMapping(value = "/custom")
 public class CustomController {
     private final GradeService gradeService;
     private final ScheduleService scheduleService;
@@ -22,15 +18,15 @@ public class CustomController {
     }
 
     @GetMapping("/grades")
-    public List<GradeDTO> getGradesByPupilAndSubject(@RequestParam("pupilId") Long pupilId,
-                                                     @RequestParam("subjectId") Long subjectId) {
-        return gradeService.getGradesPupilAndSubject(pupilId, subjectId);
+    public ResponseEntity<?> getGradesByPupilAndSubject(@RequestParam("pupilId") Long pupilId,
+                                                        @RequestParam("subjectId") Long subjectId) {
+        return ResponseEntity.ok(new ListDTO(gradeService.getGradesPupilAndSubject(pupilId, subjectId)));
     }
 
     @GetMapping("/schedule")
-    public List<ScheduleDTO> getScheduleByClassAndSubject(@RequestParam("className") String className,
+    public ResponseEntity<?> getScheduleByClassAndSubject(@RequestParam("className") String className,
                                                           @RequestParam("subjectName") String subjectName) {
-        return scheduleService.getScheduleClassAndSubject(className, subjectName);
+        return ResponseEntity.ok(scheduleService.getScheduleClassAndSubject(className, subjectName));
     }
 
 }
