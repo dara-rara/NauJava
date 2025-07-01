@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Пользователи | Школьный дневник</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container-custom {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .logo {
+            width: 60px;
+            height: 60px;
+        }
+        .btn-primary-custom {
+            background-color: #3f51b5;
+            border: none;
+            padding: 0.5rem 1.5rem;
+        }
+        .table-custom th {
+            background-color: #3f51b5;
+            color: white;
+            vertical-align: middle;
+        }
+        .alert-custom {
+            border-radius: 8px;
+        }
+        .action-btns .btn {
+            padding: 0.25rem 0.5rem;
+            margin: 0 0.1rem;
+        }
+        .badge-role {
+            padding: 0.35rem 0.5rem;
+            font-weight: 500;
+        }
+        .badge-admin {
+            background-color: #d32f2f;  /* Красный для админа (оставил как было) */
+        }
+        .badge-teacher {
+            background-color: #388e3c;  /* Зелёный для учителя (Google Material Green 700) */
+        }
+        .badge-pupil {
+            background-color: #1976d2;  /* Синий для ученика (Google Material Blue 700) */
+        }
+        .badge-user {
+            background-color: #9e9e9e;  /* Серый для обычного пользователя (Google Material Grey 500) */
+        }
+        .upload-section {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .empty-state {
+            color: #6c757d;
+            padding: 2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container-custom">
+    <div class="header">
+        <img src="https://cdn-icons-png.flaticon.com/512/3565/3565418.png" alt="Логотип" class="logo">
+        <div>
+            <a th:href="@{/admin/home}" class="btn btn-outline-secondary me-2">
+                <i class="bi bi-arrow-left"></i> Назад
+            </a>
+            <a th:href="@{/admin/users/new}" class="btn btn-primary btn-primary-custom">
+                <i class="bi bi-plus-lg"></i> Новый пользователь
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4 text-center" style="color: #3f51b5;">
+        Управление пользователями
+    </h3>
+
+    <!-- Блок массовой загрузки -->
+    <div class="card mb-4">
+        <div class="card-header d-flex align-items-center">
+            <i class="bi bi-upload me-2"></i> Массовая загрузка из CSV
+        </div>
+        <div class="card-body">
+            <form th:action="@{/admin/users/upload}" method="post" enctype="multipart/form-data">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label class="form-label">
+                            <i class="bi bi-file-earmark-spreadsheet"></i> Файл (кодировка UTF-8)
+                        </label>
+                        <input type="file" class="form-control" name="file" accept=".csv" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">
+                            <i class="bi bi-person-badge"></i> Роль
+                        </label>
+                        <select class="form-select" name="role" required>
+                            <option th:each="role : ${T(ru.glebova.NauJava.domain.Role).values()}"
+                                    th:value="${role}"
+                                    th:text="${role.name()}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex">
+                        <button type="submit" class="btn btn-primary btn-primary-custom flex-grow-1">
+                            <i class="bi bi-cloud-upload"></i> Загрузить
+                        </button>
+                        <a th:href="@{/admin/users/template}"
+                           class="btn btn-outline-secondary ms-2 flex-grow-1 text-nowrap">
+                            <i class="bi bi-file-earmark-arrow-down"></i> Шаблон
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Сообщения -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show mb-4">
+        <i class="bi bi-check-circle me-2"></i>
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${warning}" class="alert alert-warning alert-dismissible fade show mb-4">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <span th:text="${warning}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mb-4">
+        <i class="bi bi-x-circle me-2"></i>
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Ошибки импорта -->
+    <div th:if="${importErrors}" class="card border-danger mb-4">
+        <div class="card-header bg-danger text-white d-flex align-items-center">
+            <i class="bi bi-exclamation-octagon me-2"></i>
+            Ошибки при импорте
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm table-borderless mb-0">
+                    <tbody>
+                    <tr th:each="err : ${importErrors}">
+                        <td class="text-danger">
+                            <i class="bi bi-dash-circle me-2"></i>
+                            <span th:text="${err}"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Таблица пользователей -->
+    <div class="table-responsive">
+        <table class="table table-hover table-custom">
+            <thead>
+            <tr>
+                <th width="60">№</th>
+                <th> Логин</th>
+                <th>Имя</th>
+                <th> Фамилия</th>
+                <th> Роль</th>
+                <th width="180"> Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user, iter : ${users}">
+                <td th:text="${iter.count}"></td>
+                <td th:text="${user.username}"></td>
+                <td th:text="${user.firstName}"></td>
+                <td th:text="${user.lastName}"></td>
+                <td>
+                    <span th:switch="${user.role}">
+                        <span th:case="${T(ru.glebova.NauJava.domain.Role).ADMIN}" class="badge-role badge-admin">ADMIN</span>
+                        <span th:case="${T(ru.glebova.NauJava.domain.Role).TEACHER}" class="badge-role badge-teacher">TEACHER</span>
+                        <span th:case="${T(ru.glebova.NauJava.domain.Role).PUPIL}" class="badge-role badge-pupil">PUPIL</span>
+                        <span th:case="*" class="badge-role badge-user">USER</span>
+                    </span>
+                </td>
+                <td class="action-btns">
+                    <a th:href="@{/admin/users/edit(username=${user.username})}"
+                       class="btn btn-sm btn-outline-primary me-1">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <form th:action="@{/admin/users/delete}"
+                          method="post"
+                          class="d-inline"
+                          onsubmit="return confirm('Удалить пользователя?')">
+                        <input type="hidden" name="username" th:value="${user.username}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${users.empty}">
+                <td colspan="6" class="empty-state">
+                    <i class="bi bi-people display-6 opacity-25"></i>
+                    <p class="mt-3 mb-0">Нет зарегистрированных пользователей</p>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Подключение Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

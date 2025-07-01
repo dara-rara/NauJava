@@ -4,7 +4,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import ru.glebova.NauJava.domain.Subject;
 
+import java.util.Optional;
+
 @RepositoryRestResource
 public interface SubjectRepository extends CrudRepository<Subject, Long> {
-
+    Optional<Subject> findByName(String name);
+    boolean existsByName(String name);
 }

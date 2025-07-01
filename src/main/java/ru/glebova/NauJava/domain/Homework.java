@@ -1,53 +1,28 @@
 package ru.glebova.NauJava.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.FieldNameConstants;
 
-import java.time.LocalDate;
+import static lombok.AccessLevel.PRIVATE;
 
+@FieldDefaults(level = PRIVATE)
+@Setter
+@Getter
 @Entity
 @Table(name = "homework")
+@FieldNameConstants
+@NoArgsConstructor
 public class Homework {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "schedule_id", nullable = false)
-    private Schedule schedule;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
+    private PeriodLesson periodLesson;
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
-    @Temporal(TemporalType.DATE)
-    @Column(nullable = false)
-    private LocalDate dueDate;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public LocalDate getDueDate() {
-        return dueDate;
-    }
-
-    public void setDueDate(LocalDate dueDate) {
-        this.dueDate = dueDate;
-    }
-
-    public Schedule getSchedule() {
-        return schedule;
-    }
-
-    public void setSchedule(Schedule schedule) {
-        this.schedule = schedule;
-    }
 }

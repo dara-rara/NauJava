@@ -11,7 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-import ru.glebova.NauJava.service.UsersService;
+import ru.glebova.NauJava.service.impl.UsersServiceImpl;
 
 @Configuration
 @EnableWebSecurity
@@ -25,8 +25,10 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register", "/login", "/", "custom/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/report/**").hasRole("ADMIN")
+                        .requestMatchers("/register", "/login", "/").permitAll()
+                        .requestMatchers("/pupil/**").hasRole("PUPIL")
+                        .requestMatchers("/teacher/**").hasRole("TEACHER")
+                        .requestMatchers("/swagger-ui/**", "/report/**", "/admin/**", "/monitoring/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -50,10 +52,10 @@ public class SecurityConfiguration {
 
     @Bean
     public AuthenticationManager authenticationManager(
-            UsersService usersService,
+            UsersServiceImpl usersServiceImpl,
             PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(usersService);
+        provider.setUserDetailsService(usersServiceImpl);
         provider.setPasswordEncoder(passwordEncoder);
         return new ProviderManager(provider);
     }

@@ -136,17 +136,20 @@
     </div>
 
     <form th:action="@{/register}" method="post">
-        <div class="name-fields mb-3">
-            <div class="mb-3">
-                <label for="firstName" class="form-label">Имя</label>
-                <input type="text" class="form-control" id="firstName" name="firstName"
-                       placeholder="Введите имя" required>
-            </div>
-            <div class="mb-3">
-                <label for="lastName" class="form-label">Фамилия</label>
-                <input type="text" class="form-control" id="lastName" name="lastName"
-                       placeholder="Введите фамилию" required>
-            </div>
+        <div class="mb-3">
+            <label for="firstName" class="form-label">Имя</label>
+            <input type="text" class="form-control" id="firstName" name="firstName"
+                   placeholder="Введите имя" required>
+        </div>
+        <div class="mb-3">
+            <label for="lastName" class="form-label">Фамилия</label>
+            <input type="text" class="form-control" id="lastName" name="lastName"
+                   placeholder="Введите фамилию" required>
+        </div>
+        <div class="mb-3">
+            <label for="secondName" class="form-label">Отчество (второе имя)</label>
+            <input type="text" class="form-control" id="secondName" name="secondName"
+                   placeholder="Введите отчество (второе имя)" required>
         </div>
 
         <div class="mb-3">
@@ -161,9 +164,7 @@
                    placeholder="Придумайте пароль" required>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-submit">
-            Зарегистрироваться
-        </button>
+        <button type="submit" class="btn btn-primary btn-submit">Зарегистрироваться</button>
 
         <div class="auth-footer">
             <small>Уже есть аккаунт? <a th:href="@{/login}">Войти</a></small>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Настройка оценок | Школьный дневник</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container-custom {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .logo {
+            width: 60px;
+            height: 60px;
+        }
+        .btn-primary-custom {
+            background-color: #3f51b5;
+            border: none;
+            padding: 0.5rem 1.5rem;
+        }
+        .form-section {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+        }
+        .form-select, .form-control {
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+        }
+        .empty-state {
+            color: #6c757d;
+            padding: 2rem;
+            text-align: center;
+        }
+        .card-header {
+            background-color: #f5f5f5;
+            font-weight: 500;
+            border-radius: 8px 8px 0 0 !important;
+        }
+    </style>
+</head>
+<body>
+<div class="container-custom">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+            <a th:href="@{/teacher/home}" class="btn btn-outline-primary me-3">
+                <i class="bi bi-arrow-left"></i> Назад
+            </a>
+            <h3 class="mb-0" style="color: #3f51b5;">
+                <i class="bi bi-calendar-range me-2"></i>
+                Мое расписание
+            </h3>
+        </div>
+        <div class="text-muted">
+            <span th:text="${teacher.users.lastName} + ' ' + ${teacher.users.firstName}"></span>
+        </div>
+    </div>
+
+    <h3 class="mb-4 text-center" style="color: #3f51b5;">
+        Настройка оценок
+    </h3>
+
+    <!-- Сообщения -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show mb-4">
+        <i class="bi bi-check-circle me-2"></i>
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mb-4">
+        <i class="bi bi-x-circle me-2"></i>
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Форма настройки -->
+    <div class="card">
+        <div class="card-header d-flex align-items-center">
+            <i class="bi bi-gear me-2"></i> Параметры выставления оценок
+        </div>
+        <div class="card-body">
+            <form th:action="@{/teacher/grades/setup}" method="post" class="form-section">
+                <input type="hidden" id="teacherId" th:value="${teacher.id}">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Класс
+                        </label>
+                        <select name="classId" class="form-select" required
+                                th:onchange="updateSubjects(this.value)">
+                            <option value="">Выберите класс</option>
+                            <option th:each="cls : ${teacherClasses}"
+                                    th:value="${cls.id}"
+                                    th:text="${cls.name}"></option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Учебный период
+                        </label>
+                        <select name="termPeriodId" class="form-select" required>
+                            <option value="">Выберите период</option>
+                            <option th:each="period : ${termPeriods}"
+                                    th:value="${period.id}"
+                                    th:text="${period.name}"></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <label class="form-label">
+                            Предмет
+                        </label>
+                        <select name="subjectId" class="form-select" required id="subjectSelect">
+                            <option value="">Сначала выберите класс</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="reset" class="btn btn-outline-secondary me-md-2">
+                        <i class="bi bi-arrow-counterclockwise"></i> Сбросить
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-primary-custom">
+                        <i class="bi bi-check-circle"></i> Продолжить
+                    </button>
+                </div>
+            </form>
+
+            <div th:if="${teacherClasses.empty}" class="empty-state">
+                <i class="bi bi-emoji-frown display-6 opacity-25"></i>
+                <p class="mt-3 mb-0">У вас нет назначенных классов</p>
+                <p class="text-muted">Обратитесь к администратору для назначения классов</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Подключение Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function updateSubjects(classId) {
+        if (!classId) {
+            document.getElementById('subjectSelect').innerHTML =
+                '<option value="">Сначала выберите класс</option>';
+            return;
+        }
+
+        // Получаем teacherId из скрытого поля или другого источника
+        const teacherId = document.getElementById('teacherId').value;
+
+        fetch(`/api/teacher/subjects-for-class?teacherId=${teacherId}&classId=${classId}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Ошибка загрузки предметов');
+                return response.json();
+            })
+            .then(data => {
+                const select = document.getElementById('subjectSelect');
+                select.innerHTML = '';
+
+                if (data && data.length > 0) {
+                    data.forEach(subject => {
+                        const option = document.createElement('option');
+                        option.value = subject.id;
+                        option.textContent = subject.name;
+                        select.appendChild(option);
+                    });
+                } else {
+                    select.innerHTML =
+                        '<option value="">Нет предметов для этого класса</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('subjectSelect').innerHTML =
+                    '<option value="">Ошибка загрузки предметов</option>';
+            });
+    }
+
+</script>
+</body>
+</html>

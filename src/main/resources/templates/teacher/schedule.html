@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Мое расписание | Школьный дневник</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container-custom {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .week-navigation {
+            background-color: #f1f8ff;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        .day-card {
+            background-color: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .day-header {
+            color: #3f51b5;
+            padding-bottom: 0.75rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .lesson-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .lesson-item:last-child {
+            border-bottom: none;
+        }
+        .time-badge {
+            background-color: #3f51b5;
+            color: white;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="container-custom">
+    <!-- Шапка -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+            <a th:href="@{/teacher/home}" class="btn btn-outline-primary me-3">
+                <i class="bi bi-arrow-left"></i> Назад
+            </a>
+            <h3 class="mb-0" style="color: #3f51b5;">
+                <i class="bi bi-calendar-range me-2"></i>
+                Мое расписание
+            </h3>
+        </div>
+        <div class="text-muted">
+            <span th:text="${teacher.users.lastName} + ' ' + ${teacher.users.firstName}"></span>
+        </div>
+    </div>
+
+    <!-- Навигация по неделям -->
+    <div class="week-navigation">
+        <div class="d-flex justify-content-between align-items-center">
+            <a th:href="@{/teacher/schedule(weekStart=${prevWeekStart})}"
+               class="btn btn-outline-primary">
+                <i class="bi bi-chevron-left"></i> Предыдущая неделя
+            </a>
+
+            <h5 class="mb-0 text-center" style="color: #3f51b5;">
+                Неделя с
+                <span th:text="${#temporals.format(currentWeekStart, 'dd.MM.yyyy')}"></span>
+                по
+                <span th:text="${#temporals.format(currentWeekStart.plusDays(6), 'dd.MM.yyyy')}"></span>
+            </h5>
+
+            <a th:href="@{/teacher/schedule(weekStart=${nextWeekStart})}"
+               class="btn btn-outline-primary">
+                Следующая неделя <i class="bi bi-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Расписание по дням -->
+    <div th:each="i : ${#numbers.sequence(0, 5)}" th:with="day=${currentWeekStart.plusDays(i)}">
+        <div class="day-card">
+            <h4 class="day-header">
+                <span th:text="${#temporals.format(day, 'EEEE, dd.MM.yyyy')}"></span>
+            </h4>
+
+            <div th:if="${lessonsByDate.get(day) != null and !lessonsByDate.get(day).isEmpty()}">
+                <div th:each="lesson : ${lessonsByDate.get(day)}" class="lesson-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="badge time-badge">
+                                <span th:text="${#temporals.format(lesson.timeStart, 'HH:mm')} + '-' + ${#temporals.format(lesson.timeEnd, 'HH:mm')}"></span>
+                            </span>
+                            <div>
+                                <h6 class="mb-1" th:text="${lesson.classes.name}"></h6>
+                                <div class="text-muted" th:text="${lesson.subject.name}"></div>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-light text-dark">
+                                <span th:text="${lesson.lessonNumber}"></span> урок
+                            </span>
+                        </div>
+                    </div>
+                    <!-- Блок для ДЗ -->
+                    <div class="mt-3">
+                        <div th:if="${lesson.homework != null}" class="alert alert-info p-2">
+                            <strong>Домашнее задание:</strong>
+                            <p th:text="${lesson.homework.description}"></p>
+                            <button class="btn btn-sm btn-outline-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editHomeworkModal"
+                                    th:attr="data-lesson-id=${lesson.id},
+                            data-homework-id=${lesson.homework.id},
+                            data-homework-desc=${lesson.homework.description}">
+                                Редактировать
+                            </button>
+                        </div>
+                        <div th:unless="${lesson.homework != null}">
+                            <button class="btn btn-sm btn-outline-success"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#addHomeworkModal"
+                                    th:attr="data-lesson-id=${lesson.id}">
+                                Добавить ДЗ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Модальное окно для добавления ДЗ -->
+                <div class="modal fade" id="addHomeworkModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form th:action="@{/teacher/homework/add}" method="post">
+                                <input type="hidden" name="lessonId" id="addLessonId">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Добавить домашнее задание</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Описание задания</label>
+                                        <textarea class="form-control" name="description" rows="5" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Модальное окно для редактирования ДЗ -->
+                <div class="modal fade" id="editHomeworkModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form th:action="@{/teacher/homework/edit}" method="post">
+                                <input type="hidden" name="homeworkId" id="editHomeworkId">
+                                <input type="hidden" name="lessonId" id="editLessonId">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Редактировать домашнее задание</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Описание задания</label>
+                                        <textarea class="form-control" name="description" id="editHomeworkDesc" rows="5" required></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    // Инициализация модальных окон
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Для добавления ДЗ
+                        var addModal = document.getElementById('addHomeworkModal');
+                        addModal.addEventListener('show.bs.modal', function (event) {
+                            var button = event.relatedTarget;
+                            var lessonId = button.getAttribute('data-lesson-id');
+                            document.getElementById('addLessonId').value = lessonId;
+                        });
+
+                        // Для редактирования ДЗ
+                        var editModal = document.getElementById('editHomeworkModal');
+                        editModal.addEventListener('show.bs.modal', function (event) {
+                            var button = event.relatedTarget;
+                            document.getElementById('editHomeworkId').value = button.getAttribute('data-homework-id');
+                            document.getElementById('editLessonId').value = button.getAttribute('data-lesson-id');
+                            document.getElementById('editHomeworkDesc').value = button.getAttribute('data-homework-desc');
+                        });
+                    });
+                </script>
+                </div>
+            </div>
+
+            <div th:if="${lessonsByDate.get(day) == null or lessonsByDate.get(day).isEmpty()}"
+                 class="text-muted p-3 text-center">
+                <i class="bi bi-calendar-x"></i> Нет уроков в этот день
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Подключение Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

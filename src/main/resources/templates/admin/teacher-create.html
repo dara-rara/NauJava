@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить учителя | Школьный дневник</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container-custom {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .logo {
+            width: 60px;
+            height: 60px;
+        }
+        .btn-primary-custom {
+            background-color: #3f51b5;
+            border: none;
+            padding: 0.5rem 1.5rem;
+        }
+        .card-header {
+            background-color: #f8f9fa;
+            font-weight: 500;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        .form-select {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+        }
+        .btn-submit {
+            padding: 0.6rem 2rem;
+            font-weight: 500;
+        }
+        .checkbox-group {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 10px;
+        }
+        .form-check {
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .form-check:last-child {
+            border-bottom: none;
+        }
+        .form-check-input {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container-custom">
+    <div class="header">
+        <img src="https://cdn-icons-png.flaticon.com/512/3565/3565418.png" alt="Логотип" class="logo">
+        <a th:href="@{/admin/teachers}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Назад к списку
+        </a>
+    </div>
+
+    <h3 class="mb-4 text-center" style="color: #3f51b5;">
+        Добавить нового учителя
+    </h3>
+
+    <!-- Сообщения об ошибках -->
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show mb-4">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <form th:action="@{/admin/teachers/add}" method="post">
+        <!-- Основная информация -->
+        <div class="card mb-4">
+            <div class="card-header d-flex align-items-center">
+                <i class="bi bi-info-circle me-2"></i>Пользователи
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">
+                        Выберите пользователя
+                    </label>
+                    <select class="form-select" name="userId" required>
+                        <option value="">-- Выберите пользователя --</option>
+                        <option th:each="user : ${availableUsers}"
+                                th:value="${user.id}"
+                                th:text="${user.lastName + ' ' + user.firstName + ' ' + user.secondName + ' (' + user.username + ')'}">
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Предметы -->
+        <div class="card mb-4">
+            <div class="card-header d-flex align-items-center">
+                <i class="bi bi-journal-bookmark me-2"></i>Предметы
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">
+                        Выберите предметы
+                    </label>
+                    <div class="ps-3">
+                        <div th:each="subject : ${allSubjects}" class="form-check">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   name="subjectIds"
+                                   th:value="${subject.id}"
+                                   th:id="'subject-' + ${subject.id}">
+                            <label class="form-check-label"
+                                   th:for="'subject-' + ${subject.id}"
+                                   th:text="${subject.name}"></label>
+                        </div>
+                    </div>
+                    <div th:if="${allSubjects.empty}" class="text-muted p-3">
+                        Нет доступных предметов
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Классы -->
+        <div class="card mb-4">
+            <div class="card-header d-flex align-items-center">
+                <i class="bi bi-people me-2"></i>Классы
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">
+                        Выберите классы
+                    </label>
+                    <div class="ps-3">
+                        <div th:each="cls : ${allClasses}" class="form-check">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   name="classIds"
+                                   th:value="${cls.id}"
+                                   th:id="'class-' + ${cls.id}">
+                            <label class="form-check-label"
+                                   th:for="'class-' + ${cls.id}"
+                                   th:text="${cls.name}"></label>
+                        </div>
+                    </div>
+                    <div th:if="${allClasses.empty}" class="text-muted p-3">
+                        Нет доступных классов
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Кнопки отправки -->
+        <div class="d-flex justify-content-end mt-4">
+            <button type="submit" class="btn btn-primary btn-primary-custom">Создать</button>
+        </div>
+    </form>
+</div>
+
+<!-- Подключение Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

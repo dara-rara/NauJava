@@ -1,6 +1,7 @@
 package ru.glebova.NauJava.adapter.controller;
 
 import jakarta.persistence.EntityExistsException;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,15 +9,15 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.glebova.NauJava.adapter.controller.dto.RegisterDTO;
-import ru.glebova.NauJava.service.UsersService;
+import ru.glebova.NauJava.service.impl.UsersServiceImpl;
 
 @Controller
 public class AuthController {
 
-    private final UsersService usersService;
+    private final UsersServiceImpl usersServiceImpl;
 
-    public AuthController(UsersService usersService) {
-        this.usersService = usersService;
+    public AuthController(UsersServiceImpl usersServiceImpl) {
+        this.usersServiceImpl = usersServiceImpl;
     }
 
     @GetMapping("/register")
@@ -28,7 +29,7 @@ public class AuthController {
     @PostMapping("/register")
     public String registerUser(@ModelAttribute("user") RegisterDTO registrationDto, Model model) {
         try {
-            usersService.registerNewUser(registrationDto);
+            usersServiceImpl.registerNewUser(registrationDto);
             return "redirect:/login?registered";
         } catch (EntityExistsException e) {
             model.addAttribute("errorMessage", e.getMessage());
@@ -39,7 +40,8 @@ public class AuthController {
     @GetMapping("/login")
     public String showLoginForm(Model model,
                                 @RequestParam(value = "error", required = false) String error,
-                                @RequestParam(value = "registered", required = false) String registered) {
+                                @RequestParam(value = "registered", required = false) String registered,
+                                Authentication authentication) {
         return "login";
     }
 
